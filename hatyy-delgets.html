@@ -74,6 +74,60 @@
         .number-cell__delete:hover {
             background-color: #fecaca;
         }
+        .tool-name-input {
+            width: 100%;
+            min-width: 10rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.45rem 0.6rem;
+            font-weight: 600;
+            outline: none;
+        }
+        .tool-name-input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+        .tool-row-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin-top: 0.5rem;
+        }
+        .tool-row-action,
+        .tool-toolbar-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            border-radius: 0.5rem;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .tool-row-action {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+        .tool-row-action:hover {
+            background-color: #dbeafe;
+        }
+        .tool-row-action--danger,
+        .tool-toolbar-action--danger {
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+        .tool-row-action--danger:hover,
+        .tool-toolbar-action--danger:hover {
+            background-color: #fee2e2;
+        }
+        .tool-toolbar-action {
+            background-color: #ede9fe;
+            color: #5b21b6;
+        }
+        .tool-toolbar-action:hover {
+            background-color: #ddd6fe;
+        }
         .stat-value--editable {
             cursor: text;
             border-radius: 0.5rem;
@@ -154,6 +208,13 @@
                 <button id="toggleEditMode" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                     <i data-lucide="edit-2" class="icon edit-icon" data-size="18"></i>
                     <span class="edit-text">Засах</span>
+                </button>
+            </div>
+
+            <div id="toolsEditToolbar" class="hidden mb-4 flex flex-wrap gap-2">
+                <button id="addToolButton" type="button" class="tool-toolbar-action">
+                    <i data-lucide="plus" class="icon" data-size="16"></i>
+                    <span>Багаж нэмэх</span>
                 </button>
             </div>
 
@@ -318,6 +379,14 @@
             return tools.find(tool => tool.id === toolId);
         }
 
+        function getNextToolId() {
+            return tools.reduce((maxId, tool) => Math.max(maxId, Number(tool.id) || 0), 0) + 1;
+        }
+
+        function normalizeToolName(name) {
+            return String(name || '').replace(/\s+/g, ' ').trim();
+        }
+
         function isDuplicateNumber(tool, candidateNumber, currentIndex) {
             return tool.numbers.some((number, idx) => idx !== currentIndex && number === candidateNumber);
         }
@@ -383,6 +452,8 @@
         const usageHistoryTabButton = document.getElementById('usageHistoryTab');
         const usageLogPanel = document.getElementById('usageLogPanel');
         const usageHistoryPanel = document.getElementById('usageHistoryPanel');
+        const toolsEditToolbar = document.getElementById('toolsEditToolbar');
+        const addToolButton = document.getElementById('addToolButton');
 
         // ===================================
         // 1. Local Storage-ийн функцууд
@@ -410,6 +481,123 @@
                 manualUsageTotalOverride = null;
             }
             ensureUsageTimestamps();
+        }
+
+        function addToolRow() {
+            if (!ALLOW_MANUAL_NUMBER_EDIT || !editMode) {
+                return;
+            }
+
+            const rawName = window.prompt('Шинэ багажны нэр оруулна уу:');
+            const name = normalizeToolName(rawName);
+            if (!name) {
+                return;
+            }
+
+            if (tools.some(tool => tool.name === name)) {
+                alert('Ижил нэртэй багаж аль хэдийн байна.');
+                return;
+            }
+
+            tools.push({ id: getNextToolId(), name, numbers: [] });
+            saveState();
+            updateUI();
+        }
+
+        function commitToolNameEdit(toolId) {
+            if (!ALLOW_MANUAL_NUMBER_EDIT || !editMode) {
+                return;
+            }
+
+            const tool = getToolById(toolId);
+            const input = document.querySelector(`[data-tool-name-input="${toolId}"]`);
+            if (!tool || !input) {
+                return;
+            }
+
+            const nextName = normalizeToolName(input.value);
+            if (!nextName) {
+                input.value = tool.name;
+                return;
+            }
+
+            if (nextName === tool.name) {
+                return;
+            }
+
+            if (tools.some(item => item.id !== tool.id && item.name === nextName)) {
+                alert('Ижил нэртэй багаж аль хэдийн байна.');
+                input.value = tool.name;
+                return;
+            }
+
+            const oldName = tool.name;
+            tool.name = nextName;
+            usageData.forEach(entry => {
+                if (entry.name === oldName) {
+                    entry.name = nextName;
+                }
+            });
+            saveState();
+            updateUI();
+        }
+
+        function deleteToolRow(toolId) {
+            if (!ALLOW_MANUAL_NUMBER_EDIT || !editMode) {
+                return;
+            }
+
+            const tool = getToolById(toolId);
+            if (!tool) {
+                return;
+            }
+
+            if (!window.confirm(`"${tool.name}" багажийг устгах уу?`)) {
+                return;
+            }
+
+            usageData = usageData.map(entry => {
+                if (entry.name === tool.name && !entry.deleted) {
+                    return { ...entry, deleted: true };
+                }
+                return entry;
+            });
+
+            Object.keys(removedItems).forEach(key => {
+                if (key.startsWith(`${toolId}-`)) {
+                    delete removedItems[key];
+                }
+            });
+
+            tools = tools.filter(item => item.id !== toolId);
+            saveState();
+            updateUI();
+        }
+
+        function addNumberToTool(toolId) {
+            if (!ALLOW_MANUAL_NUMBER_EDIT || !editMode) {
+                return;
+            }
+
+            const tool = getToolById(toolId);
+            if (!tool) {
+                return;
+            }
+
+            const rawNumber = window.prompt(`"${tool.name}" багажны шинэ дугаарыг оруулна уу:`);
+            const nextNumber = String(rawNumber || '').trim();
+            if (!nextNumber) {
+                return;
+            }
+
+            if (tool.numbers.includes(nextNumber)) {
+                alert('Ижил дугаар аль хэдийн байна.');
+                return;
+            }
+
+            tool.numbers.push(nextNumber);
+            saveState();
+            updateUI();
         }
 
         function compactUsageDataForStorage(entries) {
@@ -1374,6 +1562,7 @@
             tbody.innerHTML = '';
             const activeUsageKeys = getActiveUsageKeySet();
             const maxColumns = Math.max(10, ...tools.map(tool => tool.numbers.length));
+            const editColumnSpan = editMode && ALLOW_MANUAL_NUMBER_EDIT ? 2 : 1;
 
             // Толгой хэсэг (Header)
             thead.innerHTML = `
@@ -1383,7 +1572,7 @@
                     <th class="border border-gray-300 p-3 text-center" colspan="${maxColumns}">
                         Багажны дугаар
                     </th>
-                    <th class="border border-gray-300 p-3 text-center bg-blue-50">Тоо</th>
+                    <th class="border border-gray-300 p-3 text-center bg-blue-50" colspan="${editColumnSpan}">Тоо</th>
                 </tr>
             `;
 
@@ -1393,10 +1582,33 @@
                 tr.className = "hover:bg-gray-50";
 
                 const count = getAvailableCountByTool(tool, activeUsageKeys);
+                const toolNameMarkup = editMode && ALLOW_MANUAL_NUMBER_EDIT
+                    ? `
+                        <div class="flex flex-col gap-2">
+                            <input
+                                type="text"
+                                class="tool-name-input"
+                                value="${escapeHtml(tool.name)}"
+                                data-tool-name-input="${tool.id}"
+                                maxlength="80"
+                            />
+                            <div class="tool-row-tools">
+                                <button type="button" class="tool-row-action" onclick="addNumberToTool(${tool.id})">
+                                    <i data-lucide="plus" class="icon" data-size="14"></i>
+                                    <span>Дугаар нэмэх</span>
+                                </button>
+                                <button type="button" class="tool-row-action tool-row-action--danger" onclick="deleteToolRow(${tool.id})">
+                                    <i data-lucide="trash-2" class="icon" data-size="14"></i>
+                                    <span>Устгах</span>
+                                </button>
+                            </div>
+                        </div>
+                    `
+                    : escapeHtml(tool.name);
 
                 let rowHTML = `
                     <td class="border border-gray-300 p-3 text-center">${tool.id}</td>
-                    <td class="border border-gray-300 p-3 font-medium">${tool.name}</td>
+                    <td class="border border-gray-300 p-3 font-medium align-top">${toolNameMarkup}</td>
                 `;
 
                 // Дугаарын нүднүүд (Number Cells)
@@ -1443,7 +1655,7 @@
 
                 // Тоо (Count)
                 rowHTML += `
-                    <td class="border border-gray-300 p-3 text-center font-bold bg-blue-50">
+                    <td class="border border-gray-300 p-3 text-center font-bold bg-blue-50" colspan="${editColumnSpan}">
                         ${count}
                     </td>
                 `;
@@ -1468,6 +1680,38 @@
             // Lucide icons-ийг шинэчлэх
             lucide.createIcons();
             attachEditableCellInteractions();
+            attachEditableToolNameInteractions();
+        }
+
+        function attachEditableToolNameInteractions() {
+            if (!editMode || !ALLOW_MANUAL_NUMBER_EDIT) {
+                return;
+            }
+
+            const inputs = document.querySelectorAll('[data-tool-name-input]');
+            inputs.forEach(input => {
+                input.addEventListener('click', event => event.stopPropagation());
+                input.addEventListener('dblclick', event => event.stopPropagation());
+                input.addEventListener('keydown', event => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        input.blur();
+                    }
+                    if (event.key === 'Escape') {
+                        event.preventDefault();
+                        const toolId = Number(input.dataset.toolNameInput);
+                        const tool = getToolById(toolId);
+                        if (tool) {
+                            input.value = tool.name;
+                        }
+                        input.blur();
+                    }
+                });
+                input.addEventListener('blur', () => {
+                    const toolId = Number(input.dataset.toolNameInput);
+                    commitToolNameEdit(toolId);
+                });
+            });
         }
 
         function attachEditableCellInteractions() {
@@ -1879,6 +2123,9 @@
             }
 
             editButton.classList.remove('hidden');
+            if (toolsEditToolbar) {
+                toolsEditToolbar.classList.toggle('hidden', !editMode);
+            }
 
             if (editMode) {
                 editIcon.setAttribute('data-lucide', 'save');
@@ -1906,6 +2153,8 @@
             updateEditButton();
             renderToolsTable(); // Засах горимоос хамаарч cell-ийн double click-ийг идэвхжүүлнэ
         });
+
+        addToolButton?.addEventListener('click', addToolRow);
 
 
         // Формд өөрчлөлт орохыг хянах
