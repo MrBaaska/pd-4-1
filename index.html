@@ -319,6 +319,7 @@
       grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
       margin-top: var(--topbar-height);
       min-height: calc(100dvh - var(--topbar-height));
+      height: calc(100dvh - var(--topbar-height));
     }
 
     /* ═══════════════════════ SIDEBAR ═══════════════════════ */
@@ -445,8 +446,10 @@
       min-width: 0;
       background: var(--bg-deep);
       background-image: var(--rail-stripe);
-      overflow: auto;
+      overflow: hidden;
       padding: var(--shell-gap);
+      height: 100%;
+      display: flex;
     }
 
     /* Welcome / Dashboard panel */
@@ -456,6 +459,8 @@
       margin: 0;
       padding: 0;
       min-width: 0;
+      height: 100%;
+      display: flex;
     }
     .dash-hero {
       position: relative;
@@ -575,8 +580,9 @@
       border: 1px solid var(--border);
       border-radius: 18px;
       overflow: hidden;
-      height: var(--frame-min-height);
-      min-height: 520px;
+      flex: 1;
+      height: 100%;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
@@ -714,21 +720,23 @@
       }
       .dashboard {
         width: 100%;
+        height: 100%;
       }
       .main {
         padding: 12px;
+        height: 100%;
       }
       .content-frame-wrap {
         width: 100%;
         max-width: none;
-        height: auto;
+        height: 100%;
         min-height: calc(100dvh - 104px);
-        display: block;
-        overflow: visible;
+        display: flex;
+        overflow: hidden;
       }
       #content-frame {
-        flex: none;
-        min-height: calc(100dvh - 160px);
+        flex: 1;
+        min-height: 0;
       }
     }
 
@@ -752,9 +760,11 @@
       }
       .dashboard {
         width: 100%;
+        height: 100%;
       }
       .main {
         padding: 10px;
+        height: 100%;
       }
       .dash-hero {
         padding: 20px 18px;
@@ -776,6 +786,7 @@
         font-size: 24px;
       }
       .content-frame-wrap {
+        height: 100%;
         min-height: calc(100dvh - 92px);
         border-radius: 14px;
       }
@@ -820,11 +831,12 @@
         font-size: 20px;
       }
       .content-frame-wrap {
+        height: 100%;
         min-height: calc(100dvh - 86px);
         border-radius: 12px;
       }
       #content-frame {
-        min-height: calc(100dvh - 142px);
+        min-height: 0;
       }
       .copyright-badge {
         right: 10px;
