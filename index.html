@@ -962,10 +962,6 @@
         <a href="#" class="sidebar-link" id="burtgel-link" data-page-key="Бүртгэл"><i class="fa fa-folder-open"></i> Бүртгэл</a>
       </div>
 
-      <div class="sidebar-item">
-        <a href="#" class="sidebar-link" id="biechilsen-link" data-page-key="Биечилсэн үзлэг"><i class="fa fa-search"></i> Зам шалгалт</a>
-      </div>
-
       <div class="sidebar-divider"></div>
 
       <div class="sidebar-item">
@@ -989,10 +985,6 @@
       </div>
 
       <div class="sidebar-divider"></div>
-
-      <div class="sidebar-item">
-          <a href="#" class="sidebar-link" id="hatyy-link" data-page-key="Хатуу тооцоот багаж"><i class="fa fa-toolbox"></i> Хатуу тооцоот багаж</a>
-      </div>
       <div class="sidebar-item">
           <a href="#" class="sidebar-link" id="passport-link" data-page-key="Паспортын үзлэг"><i class="fa fa-calculator"></i> Паспортын үзлэг</a>
       </div>
@@ -1068,6 +1060,9 @@
 
     const controls = doc.querySelectorAll('input, textarea, select, button');
     controls.forEach(function(element) {
+      if (element.hasAttribute('data-view-allowed')) {
+        return;
+      }
       const isFormField = element.matches('input, textarea, select');
       if (!enabled) {
         if (isFormField) {
@@ -1179,12 +1174,10 @@
     'Төлөвлөгөө / Сарын ажлын төлөвлөгөө': 'sariin.html',
     'Шийдвэр': 'shiidwer.html',
     'Үүрэг даалгавар': 'ita.html',
-    'Биечилсэн үзлэг': 'biychilsen.html',
     'Менежментийн нэгдсэн тогтолцоо': 'anhaar.html',
     'Ажилтануудын мэдээлэл': 'ajiltan.html',
     'Суман шилжүүлгийн бүртгэл': 'sum.html',
     'ХАБЭА-н үзлэг': 'habea.html',
-    'Хатуу тооцоот багаж': 'hatyy-delgets.html',
     'Паспортын үзлэг': 'passport.html',
     'Замын техникийн байдал': 'tech.html',
     'Хэсгийн танилцуулга': 'heseg.html',

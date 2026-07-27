@@ -556,7 +556,7 @@
 <!-- HEADER -->
 <header class="header">
     <div class="header-title">
-      <span style="font-size: large;">замын 2-р ангийн 15-р хэсэг /менежмент, аудитын бүртгэл-2026/</span>
+      <span style="font-size: large;">замын 2-р ангийн 4-р хэсэг /менежмент, аудитын бүртгэл-2026/</span>
     </div>
   </div>
 </header>
@@ -692,6 +692,37 @@
 
   const tbody = document.getElementById('requirementList');
 
+  function unlockRequirementTable() {
+    const controls = tbody ? tbody.querySelectorAll('textarea, input, select, button') : [];
+    controls.forEach((el) => {
+      el.removeAttribute('readonly');
+      el.removeAttribute('disabled');
+      el.removeAttribute('aria-disabled');
+      el.removeAttribute('data-locked-by-mode');
+    });
+  }
+
+  function watchRequirementTableLocks() {
+    if (!tbody || tbody.dataset.lockWatchAttached === 'true') {
+      return;
+    }
+
+    tbody.dataset.lockWatchAttached = 'true';
+
+    const observer = new MutationObserver(() => {
+      unlockRequirementTable();
+    });
+
+    observer.observe(tbody, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['readonly', 'disabled', 'aria-disabled', 'data-locked-by-mode']
+    });
+
+    window.addEventListener('pageshow', unlockRequirementTable);
+  }
+
   // Мөр нэгтгэх тохиргоо: {start: эхлэх индекс, rowspan: хэдэн мөр нэгтгэх}
   const mergeRows = [
     { start: 9, rowspan: 2 }, // 10, 11-р мөр
@@ -772,6 +803,9 @@
       tbody.appendChild(tr);
     }
   });
+
+  unlockRequirementTable();
+  watchRequirementTableLocks();
 
     // ...хоосон мөрийг labels дээр бүртгэсэн тул энд давхар нэмэх шаардлагагүй...
 
@@ -919,6 +953,8 @@
       loadTableData();
       updateSelectCounter();
       updateSelectColors();
+      unlockRequirementTable();
+      watchRequirementTableLocks();
     });
 
     document.addEventListener('input', function(e) {
