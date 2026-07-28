@@ -1153,10 +1153,6 @@
                 <div class="worker-form">
                     <input type="text" id="job" placeholder="Ажлын нэр">
                     <div class="name-selector">
-                        <div class="name-selector-head">
-                            <input type="text" id="nameSearch" placeholder="Нэр шүүж эсвэл шинэ нэр бичих">
-                            <button type="button" id="addNameOption">Нэмэх</button>
-                        </div>
                         <div class="name-selector-meta">
                             <span>Товшиж сонгох</span>
                             <span id="nameSelectionSummary" class="name-selector-summary">0 сонгогдсон</span>
@@ -1178,18 +1174,17 @@
 
             <div class="footer-section batlav">
                 <label style="color: #000; text-align: center; font-size: 1.4em; font-weight: 900;">Боловсруулсан:</label>
-                <select id="preparedBy" data-view-allowed="true">
-                    <option value="ПДБ Ч.Нандинцэцэг">ПДБ Ч.Нандинцэцэг</option>
+                <select id="preparedBy" data-allow-view-edit="1">
                     <option value="ПДБ Э.Түдэв">ПДБ Э.Түдэв</option>
                     <option value="ПДБ С.Амгаланбаатар">ПДБ С.Амгаланбаатар</option>
                     <option value="ПДБ С.Батбаяр">ПДБ С.Батбаяр</option>
                 </select>
                 <label>Хянасан:</label>
-                <select id="reviewedBy" data-view-allowed="true">
-                    <option value="ПД Ё.Гантуяа">ПД Ё.Гантуяа</option>
-                    <option value="ПДБк Ч.Нандинцэцэг">ПДБк Ч.Нандинцэцэг</option>
+                <select id="reviewedBy" data-allow-view-edit="1">
+                    <option value="ПДБ Ё.Гантуяа">ПД Ё.Гантуяа</option>
+                    <option value="ПДБ Ц.Нандинцэцэг">ПДБ Ц.Нандинцэцэг</option>
                 </select>
-                <button type="button" class="save-btn" id="saveDataBtn" data-view-allowed="true">💾 Хадгалах</button>
+                <button type="button" class="save-btn" id="saveDataBtn" data-allow-view-edit="1">💾 Хадгалах</button>
             </div>
         </div>
 
@@ -1233,33 +1228,51 @@
             const RECORDS_STORE_NAME = "app_storage";
             const RECORDS_PRIMARY_KEY = "saved_records";
             const DEFAULT_EMPLOYEE_NAMES = [
-                "пр-1 Б.Бат",
-                "пр-2 Ц.Дорж",
-                "пр-3 Г.Отгон",
-                "пр-4 Г.Нэргүй",
-                "пр-5 Д.Түмэн",
-                "пр-6 С.Баяр",
-                "пр-7 П.Ганбат",
-                "пр-8 Р.Мөнх",
-                "пр-9 Л.Эрдэнэ",
-                "пр-10 Ш.Төгөлдөр",
-                "пр-11 Т.Болор",
-                "пр-12 Н.Энхболд",
-                "пр-13 М.Хишиг",
-                "пр-14 А.Оргил",
-                "пр-15 Х.Сүхбат",
-                "пр-16 Д.Номин",
-                "пр-17 Б.Тэмүүлэн",
-                "пр-18 Г.Уянга",
-                "пр-19 С.Эрдэнэсайхан",
-                "пр-20 Ц.Энхмэнд"
+                "пр-5 О.Эрхэмбаяр",
+                "пр-4 Д.Мөнхбаяр",
+                "пр-4 Б.Батжаргал",
+                "пр-4 Д.Баасанжав",
+                "пр-4 С.Ууганбаяр",
+                "пр-4 Б.Дашням",
+                "пр-4 А.Хүрэлтулга",
+                "пр-4 Б.Мөнгөнхүү",
+                "пр-3 Э.Энхбаатар",
+                "пр-3 Ө.БатЭрдэнэ",
+                "пр-3 Э.Жавзандулам",
+                "С/Ц Г.Ариунбаяр",
+                "пр-3 Г.Батжаргал",
+                "пр-3 А.Амаржаргал",
+                "пр-3 Б.Хулан",
+                "Т/З С.Амартүвшин",
+                "Г/Ж Т.Түмэннасан",
+                "Г/Ж А.Ариунжаргал",
+                "Г/Ж Т.Пүрэвжаргал",
+                "Г/Ж Ц.Наранцацрал",
+                "Г/Ж С.Байгалмаа",
+                "Г/Ж Н.БатӨлзий",
+                "Г/Ж Я.Дунгаамаа",
+                "Г/Ж Б.Хандсүрэн",
+                "пр-3 Г.Дөлгөөн",
+                "пр-3 Н.Жигжидсүрэн",
+                "пр-3 Ц.Батхүү",
+                "пр-3 Г.Баттогтох",
+                "пр-3 Э.Шинэцэцэг",
+                "пр-3 Б.Урангоо",
+                "пр-3 М.СодЭрдэнэ",
+                "пр-3 Т.Түвшинболд",
+                "Жолооч Б.Банзрагч",
             ];
             let savedRecords = [];
             let employeeNames = [];
             let selectedNames = new Set();
+            const DEFAULT_EMPLOYEE_NAME_SET = new Set(DEFAULT_EMPLOYEE_NAMES.map(normalizeName));
 
         function normalizeName(value) {
             return value ? value.trim().replace(/\s+/g, " ") : "";
+        }
+
+        function isAllowedEmployeeName(name) {
+            return DEFAULT_EMPLOYEE_NAME_SET.has(normalizeName(name));
         }
 
         function persistEmployeeNames() {
@@ -1379,7 +1392,9 @@
 
                 const parsed = JSON.parse(raw);
                 const selectedFromDraft = Array.isArray(parsed?.selectedNames)
-                    ? parsed.selectedNames.map(normalizeName).filter(Boolean)
+                    ? parsed.selectedNames
+                        .map(normalizeName)
+                        .filter((name) => name && isAllowedEmployeeName(name))
                     : [];
                 selectedNames = new Set(selectedFromDraft);
 
@@ -1390,7 +1405,7 @@
                 if (Array.isArray(parsed?.workers) && parsed.workers.length > 0) {
                     parsed.workers.forEach((worker) => {
                         const name = normalizeName(worker?.name);
-                        if (!name) {
+                        if (!name || !isAllowedEmployeeName(name)) {
                             return;
                         }
                         const job = (worker?.job || "").trim();
@@ -1401,7 +1416,17 @@
 
                 if (recentSelectionPanel) {
                     recentSelectionPanel.innerHTML = parsed?.recentSelectionHtml || "";
-                    recentSelectionPanel.style.display = parsed?.recentSelectionVisible && recentSelectionPanel.innerHTML
+                    Array.from(recentSelectionPanel.querySelectorAll(".recent-selection-item")).forEach((item) => {
+                        if (!isAllowedEmployeeName(item.textContent || "")) {
+                            item.remove();
+                        }
+                    });
+                    Array.from(recentSelectionPanel.querySelectorAll(".recent-selection-entry")).forEach((entry) => {
+                        if (entry.querySelectorAll(".recent-selection-item").length === 0) {
+                            entry.remove();
+                        }
+                    });
+                    recentSelectionPanel.style.display = parsed?.recentSelectionVisible && recentSelectionPanel.querySelectorAll(".recent-selection-entry").length > 0
                         ? "block"
                         : "none";
                 }
@@ -1413,45 +1438,17 @@
 
         function loadEmployeeNames() {
             try {
-                const raw = localStorage.getItem(NAME_DIRECTORY_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed)) {
-                        employeeNames = Array.from(new Set([
-                            ...parsed.map(normalizeName).filter(Boolean),
-                            ...DEFAULT_EMPLOYEE_NAMES.map(normalizeName)
-                        ])).sort((left, right) => left.localeCompare(right, "mn"));
-                        persistEmployeeNames();
-                        return;
-                    }
-                }
-
-                const seededNames = [];
-                savedRecords.forEach((record) => {
-                    if (!record || !Array.isArray(record.workers)) {
-                        return;
-                    }
-                    record.workers.forEach((worker) => {
-                        const normalized = normalizeName(worker && worker.name);
-                        if (normalized) {
-                            seededNames.push(normalized);
-                        }
-                    });
-                });
-                employeeNames = Array.from(new Set([
-                    ...seededNames,
-                    ...DEFAULT_EMPLOYEE_NAMES.map(normalizeName)
-                ])).sort((left, right) => left.localeCompare(right, "mn"));
+                employeeNames = [...DEFAULT_EMPLOYEE_NAME_SET].sort((left, right) => left.localeCompare(right, "mn"));
                 persistEmployeeNames();
             } catch (error) {
                 console.error("Employee names load error:", error);
-                employeeNames = [...DEFAULT_EMPLOYEE_NAMES].sort((left, right) => left.localeCompare(right, "mn"));
+                employeeNames = [...DEFAULT_EMPLOYEE_NAME_SET].sort((left, right) => left.localeCompare(right, "mn"));
                 persistEmployeeNames();
             }
         }
 
         function setEmployeeNames(nextNames) {
-            employeeNames = Array.from(new Set(nextNames.map(normalizeName).filter(Boolean))).sort((left, right) => left.localeCompare(right, "mn"));
+            employeeNames = [...DEFAULT_EMPLOYEE_NAME_SET].sort((left, right) => left.localeCompare(right, "mn"));
             persistEmployeeNames();
             renderNameOptions();
         }
@@ -1462,15 +1459,9 @@
                 return false;
             }
 
-            if (normalized.length < 2) {
-                alert("Нэр хамгийн багадаа 2 тэмдэгттэй байна.");
+            if (!isAllowedEmployeeName(normalized)) {
+                alert(`\"${normalized}\" нэр жагсаалтад байхгүй тул нэмэгдэхгүй.`);
                 return false;
-            }
-
-            if (!employeeNames.includes(normalized)) {
-                employeeNames.push(normalized);
-                employeeNames.sort((left, right) => left.localeCompare(right, "mn"));
-                persistEmployeeNames();
             }
 
             selectedNames.add(normalized);
@@ -1480,46 +1471,11 @@
         }
 
         function editEmployeeName(oldName) {
-            const nextName = normalizeName(window.prompt("Нэрийг засах", oldName));
-            if (!nextName) {
-                return;
-            }
-
-            if (nextName.length < 2) {
-                alert("Нэр хамгийн багадаа 2 тэмдэгттэй байна.");
-                return;
-            }
-
-            if (nextName === oldName) {
-                return;
-            }
-
-            if (employeeNames.includes(nextName)) {
-                alert("Энэ нэр аль хэдийн байна!");
-                return;
-            }
-
-            employeeNames = employeeNames.map((name) => (name === oldName ? nextName : name));
-            if (selectedNames.has(oldName)) {
-                selectedNames.delete(oldName);
-                selectedNames.add(nextName);
-            }
-            persistEmployeeNames();
-            renderNameOptions();
-            saveWorkerDraft();
+            alert("Нэр засах боломж хаалттай.");
         }
 
         function deleteEmployeeName(name) {
-            const confirmed = window.confirm(`"${name}" нэрийг устгах уу?`);
-            if (!confirmed) {
-                return;
-            }
-
-            employeeNames = employeeNames.filter((item) => item !== name);
-            selectedNames.delete(name);
-            persistEmployeeNames();
-            renderNameOptions();
-            saveWorkerDraft();
+            alert("Нэр устгах боломж хаалттай.");
         }
 
         function getKnownNames() {
@@ -1554,7 +1510,7 @@
                 emptyState.className = "name-options-empty";
                 emptyState.innerHTML = query
                     ? `<strong>${nameSearchInput.value}</strong> нэр олдсонгүй`
-                    : "Хадгалсан нэр алга. Эхний нэрийг дээрх талбараар нэмнэ үү.";
+                    : "Одоогоор сонгох нэрийн жагсаалт хоосон байна.";
                 nameOptions.appendChild(emptyState);
                 updateNameSelectionSummary();
                 return;
@@ -1594,36 +1550,7 @@
                 const text = document.createElement("span");
                 text.className = "name-option-text";
                 text.textContent = name;
-
-                const actions = document.createElement("span");
-                actions.className = "name-option-actions";
-
-                const editBtn = document.createElement("button");
-                editBtn.type = "button";
-                editBtn.className = "name-option-action edit";
-                editBtn.title = "Засах";
-                editBtn.innerHTML = '<i class="fa fa-pen"></i>';
-                editBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    editEmployeeName(name);
-                });
-
-                const deleteBtn = document.createElement("button");
-                deleteBtn.type = "button";
-                deleteBtn.className = "name-option-action delete";
-                deleteBtn.title = "Устгах";
-                deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
-                deleteBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    deleteEmployeeName(name);
-                });
-
-                actions.appendChild(editBtn);
-                actions.appendChild(deleteBtn);
                 body.appendChild(text);
-                body.appendChild(actions);
 
                 label.appendChild(checkbox);
                 label.appendChild(body);
@@ -1639,8 +1566,8 @@
                 return;
             }
 
-            addEmployeeName(newName);
-            if (nameSearchInput) {
+            const isSelected = addEmployeeName(newName);
+            if (isSelected && nameSearchInput) {
                 nameSearchInput.value = "";
             }
             renderNameOptions();
@@ -2016,7 +1943,9 @@
                 selectedNames.clear();
                 updateNameSelectionSummary();
                 renderNameOptions();
-                nameSearchInput.focus();
+                if (nameSearchInput) {
+                    nameSearchInput.focus();
+                }
                 saveWorkerDraft();
             } else {
                 alert("Чекээр дор хаяж нэг нэр сонгож, ажлын нэр оруулна уу!");
