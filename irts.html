@@ -781,6 +781,16 @@ function todayStr(){ return new Date().toISOString().split('T')[0]; }
 function fmtDate(d){ if(!d)return''; const [y,m,day]=d.split('-'); return `${y}.${m}.${day}`; }
 function getInitial(name){ const p=name.split(' '); return p[p.length-1].charAt(0).toUpperCase(); }
 function getDayStatus(dateStr,empId){ return (attendance[dateStr] && attendance[dateStr][empId]) || null; }
+function countEmployeesByStatus(dateStr, statuses){
+  const day = attendance[dateStr];
+  if(!day) return 0;
+  const statusSet = new Set(Array.isArray(statuses) ? statuses : [statuses]);
+  let count = 0;
+  employees.forEach(emp=>{
+    if(statusSet.has(day[emp.id])) count++;
+  });
+  return count;
+}
 function isWeekend(dateStr){ const d=new Date(dateStr); return d.getDay()===0 || d.getDay()===6; }
 function avatarColor(id){
   const colors=['#2563eb','#7c3aed','#0891b2','#059669','#d97706','#dc2626','#db2777','#4338ca'];
@@ -1119,15 +1129,7 @@ function renderSummaryTable(){
     if(isWe){
       td.style.background='rgba(255,235,0,0.08)';
     }
-    let cnt=0;
-    if(attendance[dateStr]){
-      employees.forEach(emp=>{
-        const s=attendance[dateStr][emp.id]||'';
-        if(s==='ажилд'||s==='илүү цаг') cnt++;
-      });
-    } else if(!isWe) {
-      cnt=employees.length;
-    }
+    const cnt=countEmployeesByStatus(dateStr, ['ажилд','илүү цаг']);
     if(cnt>0){
       td.style.color='var(--work)';
       td.style.fontWeight='700';
@@ -1245,6 +1247,7 @@ function deleteEmployee(id){
   employees=employees.filter(e=>e.id!==id);
   saveAll();
   renderDaily();
+  if(currentView==='summary') renderSummaryTable();
   showToast('Устгагдлаа','var(--sick)');
 }
 
