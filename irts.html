@@ -760,7 +760,25 @@ const DEFAULT_EMPLOYEES = [
 ];
 
 let employees  = JSON.parse(localStorage.getItem('irts_employees')  || 'null') || DEFAULT_EMPLOYEES;
-let attendance = JSON.parse(localStorage.getItem('irts_attendance') || '{}');
+
+function loadAttendance(){
+  try{
+    const stored=JSON.parse(localStorage.getItem('irts_attendance')||'{}');
+    if(!stored || typeof stored!=='object' || Array.isArray(stored)) return {};
+
+    return Object.keys(stored).reduce((days,dateStr)=>{
+      const day=stored[dateStr];
+      if(day && typeof day==='object' && !Array.isArray(day)){
+        days[dateStr]={...day};
+      }
+      return days;
+    },{});
+  }catch(error){
+    return {};
+  }
+}
+
+let attendance = loadAttendance();
 let reqStaff   = JSON.parse(localStorage.getItem('irts_req')        || 'null') || {total:20, min:15};
 let nextId     = employees.reduce((m,e) => Math.max(m, e.id), 0) + 1;
 let currentView = 'daily';
@@ -780,16 +798,13 @@ function saveAll(){
 function todayStr(){ return new Date().toISOString().split('T')[0]; }
 function fmtDate(d){ if(!d)return''; const [y,m,day]=d.split('-'); return `${y}.${m}.${day}`; }
 function getInitial(name){ const p=name.split(' '); return p[p.length-1].charAt(0).toUpperCase(); }
-function getDayStatus(dateStr,empId){ return (attendance[dateStr] && attendance[dateStr][empId]) || null; }
-function countEmployeesByStatus(dateStr, statuses){
-  const day = attendance[dateStr];
-  if(!day) return 0;
-  const statusSet = new Set(Array.isArray(statuses) ? statuses : [statuses]);
-  let count = 0;
-  employees.forEach(emp=>{
-    if(statusSet.has(day[emp.id])) count++;
-  });
-  return count;
+function getDayStatus(dateStr,empId){
+  const day=attendance[dateStr];
+  return day && Object.prototype.hasOwnProperty.call(day,empId) ? day[empId] : null;
+}
+function getDayAttendance(dateStr){
+  const day=attendance[dateStr];
+  return day && typeof day==='object' && !Array.isArray(day) ? day : {};
 }
 function isWeekend(dateStr){ const d=new Date(dateStr); return d.getDay()===0 || d.getDay()===6; }
 function avatarColor(id){
@@ -948,8 +963,7 @@ function changeStatus(sel, dateStr){
   const id=parseInt(sel.dataset.id);
   const s=sel.value;
   sel.className='status-select '+(STATUS_CSS[s]||'ss-empty');
-  if(!attendance[dateStr]) attendance[dateStr]={};
-  attendance[dateStr][id]=s;
+  attendance[dateStr]={...getDayAttendance(dateStr),[id]:s};
   saveAll();
   renderStats(dateStr);
   showToast('Хадгалагдлаа');
@@ -1129,7 +1143,13 @@ function renderSummaryTable(){
     if(isWe){
       td.style.background='rgba(255,235,0,0.08)';
     }
-    const cnt=countEmployeesByStatus(dateStr, ['ажилд','илүү цаг']);
+    let cnt=0;
+    if(attendance[dateStr]){
+      employees.forEach(emp=>{
+        const s=attendance[dateStr][emp.id]||'';
+        if(s==='ажилд'||s==='илүү цаг') cnt++;
+      });
+    }
     if(cnt>0){
       td.style.color='var(--work)';
       td.style.fontWeight='700';
