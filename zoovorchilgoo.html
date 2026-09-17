@@ -996,7 +996,7 @@
                     <option value="НОГООНТОЛГОЙ">НОГООНТОЛГОЙ</option>
                     <option value="РАШААНТ">РАШААНТ</option>
                     <option value="ДАВААНЫ">ДАВААНЫ</option>
-                    <option value="ЭМЭЭЛТ">ЭМЭЭЛТ</option>  
+                    <option value="ЭМЭЭЛТ">ЭМЭЭЛТ</option>
                 </select>
                 <span>ХООРОНДЫН ЗАМЫН</span>
                 <input type="number" id="distance1" placeholder="0">
@@ -1135,13 +1135,15 @@
             <div class="footer-section batlav">
                 <label style="color: #000; text-align: center; font-size: 1.4em; font-weight: 900;">Боловсруулсан:</label>
                 <select id="preparedBy" data-allow-view-edit="1">
+                    <option value="ПДБ Н.Нандинцэцэг">ПДБ Н.Нандинцэцэг</option>
                     <option value="ПДБ Э.Түдэв">ПДБ Э.Түдэв</option>
                     <option value="ПДБ С.Амгаланбаатар">ПДБ С.Амгаланбаатар</option>
                     <option value="ПДБ С.Батбаяр">ПДБ С.Батбаяр</option>
+                    <option value="ПДБ О.Эрхэмбаяр">ПДБ О.Эрхэмбаяр</option>
                 </select>
                 <label>Хянасан:</label>
                 <select id="reviewedBy" data-allow-view-edit="1">
-                    <option value="ПДБ Ё.Гантуяа">ПД Ё.Гантуяа</option>
+                    <option value="ПД Ё.Гантуяа">ПД Ё.Гантуяа</option>
                     <option value="ПДБ Ц.Нандинцэцэг">ПДБ Ц.Нандинцэцэг</option>
                 </select>
                 <button type="button" class="save-btn" id="saveDataBtn" data-allow-view-edit="1">💾 Хадгалах</button>
@@ -1189,7 +1191,7 @@
             const RECORDS_PRIMARY_KEY = "saved_records";
             const DEFAULT_EMPLOYEE_NAMES = [
                 "пр-5 О.Эрхэмбаяр",
-                "пр-4 Д.Мөнхбаяр",
+                "пр-4 Д.Мөнхбат",
                 "пр-4 Д.Баасанжав",
                 "пр-4 С.Ууганбаяр",
                 "пр-4 Б.Дашням",
@@ -1220,7 +1222,7 @@
                 "пр-3 Т.Түвшинболд",
                 "пр-2 Б.Отгонтуяа",
                 "пр-3 А.Жавзан",
-                "Жолооч Б.Банзрагч",
+                "Жолооч Б.Банзрагч",                            
             ];
             let savedRecords = [];
             let employeeNames = [];

@@ -31,7 +31,7 @@
       --shell-gap: clamp(12px, 2vw, 24px);
       --shell-pad: clamp(12px, 2vw, 28px);
       --sidebar-width: 320px;
-      --frame-min-height: clamp(520px, calc(100dvh - 168px), 980px);
+      --frame-min-height: calc(100dvh - var(--topbar-height) - (var(--shell-gap) * 2));
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -239,54 +239,6 @@
       gap: 16px;
       flex-shrink: 0;
     }
-    .mode-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .mode-badge.view {
-      color: var(--accent3);
-      background: rgba(255, 215, 0, 0.1);
-      border-color: rgba(255, 215, 0, 0.35);
-    }
-    .mode-badge.edit {
-      color: var(--accent2);
-      background: rgba(9, 243, 114, 0.1);
-      border-color: rgba(9, 243, 114, 0.35);
-    }
-    .mode-btn {
-      border: 1px solid var(--border-glow);
-      background: rgba(0, 212, 255, 0.08);
-      color: var(--text-primary);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .mode-btn:hover {
-      background: rgba(0, 212, 255, 0.16);
-      border-color: var(--accent);
-    }
-    .mode-btn.logout {
-      border-color: rgba(255, 61, 61, 0.4);
-      background: rgba(255, 61, 61, 0.1);
-      color: #ffd7d7;
-    }
-    .mode-btn.logout:hover {
-      background: rgba(255, 61, 61, 0.18);
-      border-color: rgba(255, 61, 61, 0.7);
-    }
     .status-badge {
       display: flex;
       align-items: center;
@@ -294,6 +246,48 @@
       font-family: 'Share Tech Mono', monospace;
       font-size: var(--topbar-font-size);
       color: var(--text-muted);
+    }
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.04);
+      color: var(--text-muted);
+    }
+    .mode-badge.edit {
+      color: var(--accent);
+      background: rgba(0,212,255,0.08);
+      border-color: rgba(0,212,255,0.22);
+    }
+    .mode-toggle {
+      appearance: none;
+      border: 1px solid var(--border-glow);
+      background: linear-gradient(180deg, rgba(0,212,255,0.14), rgba(0,212,255,0.08));
+      color: var(--text-primary);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 9px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+    .mode-toggle:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(180deg, rgba(0,212,255,0.22), rgba(0,212,255,0.12));
+      border-color: var(--accent);
+    }
+    .mode-toggle:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
     .status-dot {
       width: 7px; height: 7px;
@@ -319,7 +313,6 @@
       grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
       margin-top: var(--topbar-height);
       min-height: calc(100dvh - var(--topbar-height));
-      height: calc(100dvh - var(--topbar-height));
     }
 
     /* ═══════════════════════ SIDEBAR ═══════════════════════ */
@@ -421,10 +414,6 @@
       border-radius: 7px;
       transition: all 0.15s;
     }
-    .sidebar-sub a.active {
-      color: var(--accent);
-      background: rgba(0,212,255,0.07);
-    }
     .sidebar-sub a::before {
       content: '─';
       font-size: 10px;
@@ -446,10 +435,13 @@
       min-width: 0;
       background: var(--bg-deep);
       background-image: var(--rail-stripe);
-      overflow: hidden;
+      overflow: auto;
       padding: var(--shell-gap);
-      height: 100%;
+      min-height: calc(100dvh - var(--topbar-height));
       display: flex;
+    }
+    .main.fullscreen-main {
+      padding: 0;
     }
 
     /* Welcome / Dashboard panel */
@@ -459,8 +451,8 @@
       margin: 0;
       padding: 0;
       min-width: 0;
-      height: 100%;
       display: flex;
+      flex: 1;
     }
     .dash-hero {
       position: relative;
@@ -580,12 +572,21 @@
       border: 1px solid var(--border);
       border-radius: 18px;
       overflow: hidden;
-      flex: 1;
-      height: 100%;
-      min-height: 0;
+      height: var(--frame-min-height);
+      min-height: calc(100dvh - var(--topbar-height) - (var(--shell-gap) * 2));
+      max-height: calc(100dvh - var(--topbar-height) - (var(--shell-gap) * 2));
+      width: 100%;
       display: flex;
       flex-direction: column;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+    }
+    .main.fullscreen-main .content-frame-wrap {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      height: calc(100dvh - var(--topbar-height));
+      min-height: calc(100dvh - var(--topbar-height));
+      max-height: calc(100dvh - var(--topbar-height));
     }
     .frame-titlebar {
       display: flex;
@@ -598,6 +599,9 @@
       color: var(--text-muted);
       min-height: 54px;
     }
+    .main.fullscreen-main .frame-titlebar {
+      display: none;
+    }
     .frame-dot {
       width: 9px; height: 9px;
       border-radius: 50%;
@@ -609,6 +613,9 @@
       border: none;
       display: block;
       background: transparent;
+    }
+    .main.fullscreen-main #content-frame {
+      min-height: calc(100dvh - var(--topbar-height));
     }
 
     .sidebar-overlay {
@@ -720,23 +727,21 @@
       }
       .dashboard {
         width: 100%;
-        height: 100%;
       }
       .main {
         padding: 12px;
-        height: 100%;
       }
       .content-frame-wrap {
         width: 100%;
         max-width: none;
-        height: 100%;
+        height: auto;
         min-height: calc(100dvh - 104px);
-        display: flex;
-        overflow: hidden;
+        display: block;
+        overflow: visible;
       }
       #content-frame {
-        flex: 1;
-        min-height: 0;
+        flex: none;
+        min-height: calc(100dvh - 160px);
       }
     }
 
@@ -760,11 +765,9 @@
       }
       .dashboard {
         width: 100%;
-        height: 100%;
       }
       .main {
         padding: 10px;
-        height: 100%;
       }
       .dash-hero {
         padding: 20px 18px;
@@ -786,7 +789,6 @@
         font-size: 24px;
       }
       .content-frame-wrap {
-        height: 100%;
         min-height: calc(100dvh - 92px);
         border-radius: 14px;
       }
@@ -831,12 +833,11 @@
         font-size: 20px;
       }
       .content-frame-wrap {
-        height: 100%;
         min-height: calc(100dvh - 86px);
         border-radius: 12px;
       }
       #content-frame {
-        min-height: 0;
+        min-height: calc(100dvh - 142px);
       }
       .copyright-badge {
         right: 10px;
@@ -867,6 +868,7 @@
     <ul class="nav-links" id="topNav">
       <li><a href="#" data-page-key="Тушаал, стандарт"><i class="fa fa-file-lines" style="margin-right:4px"></i>Тушаал, стандарт</a></li>
       <li><a href="#" data-page-key="Цахилгаан"><i class="fa fa-bolt" style="margin-right:4px"></i>Цахилгаан</a></li>
+
       <li>
         <span onclick="toggleNav(this)">
           <i class="fa fa-calendar-check"></i> Төлөвлөгөө
@@ -918,7 +920,7 @@
 
     <div class="topbar-status">
       <div class="mode-badge view" id="mode-badge">Харах горим</div>
-      <button class="mode-btn" id="mode-toggle-btn" type="button">Кодоор нэвтрэх</button>
+      <button class="mode-toggle" id="mode-toggle" type="button" aria-pressed="false">Кодоор нэвтрэх</button>
       <div class="clock" id="clock">--:--:--</div>
     </div>
 
@@ -933,11 +935,12 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-header">⬡ Үйл ажиллагаа</div>
+
     <nav class="sidebar-nav">
 
-        <div class="sidebar-item">
-          <a href="#" class="sidebar-link" id="irts-link" data-page-key="Ирц бүртгэл"><i class="fa fa-calendar-check"></i> Ирц бүртгэл</a>
-        </div>
+      <div class="sidebar-item">
+        <a href="irts.html" class="sidebar-link" id="irts-link" data-page-key="Ирц бүртгэл"><i class="fa fa-calendar-check"></i> Ирц бүртгэл</a>
+      </div>
 
       <div class="sidebar-item has-sub" onclick="toggleSub(this)">
         <div class="sidebar-link"><i class="fa fa-book-open"></i> Аюулгүй ажиллагааны зааварчилгаа</div>
@@ -957,7 +960,7 @@
       </div>
 
       <div class="sidebar-item">
-        <a href="#" class="sidebar-link" id="burtgel-link" data-page-key="Бүртгэл"><i class="fa fa-folder-open"></i> Зааварчилгаа авсан ажилтаны бүртгэл</a>
+        <a href="#" class="sidebar-link" id="burtgel-link" data-page-key="Бүртгэл"><i class="fa fa-folder-open"></i>Зааварчилгаа авсан ажилтаны бүртгэл</a>
       </div>
 
       <div class="sidebar-divider"></div>
@@ -987,12 +990,12 @@
         <div class="sidebar-sub">
           <a href="#" id="ajiltan-link" data-page-key="Ажилтануудын мэдээлэл">Ажилтануудын мэдээлэл</a>
           <a href="#" id="sum-link" data-page-key="Суман шилжүүлгийн бүртгэл">Суман шилжүүлгийн бүртгэл</a>
-          <a href="#" data-page-key="Малтай айлын судалгаа">Малтай айлын судалгаа</a>
-          <a href="#" data-page-key="Гүүр, хоолойн судалгаа">Гүүр, хоолойн судалгаа</a>
-          <a href="#" data-page-key="ПУ-5 дэр модны судалгаа">ПУ-5 дэр модны судалгаа</a>
-          <a href="#" data-page-key="ПУ-2 зам төмрийн судалгаа">ПУ-2 зам төмрийн судалгаа</a>
-          <a href="#" data-page-key="Нөөц зам төмрийн судалгаа">Нөөц зам төмрийн судалгаа</a>
-          <a href="#" data-page-key="Уулзварын зайн судалгаа">Уулзварын зайн судалгаа</a>
+          <a href="#" id="maltai-ail-link" data-page-key="Малтай айлын судалгаа">Малтай айлын судалгаа</a>
+          <a href="#" id="guur-hooloi-link" data-page-key="Гүүр, хоолойн судалгаа">Гүүр, хоолойн судалгаа</a>
+          <a href="#" id="pu5-dermod-link" data-page-key="ПУ-5 дэр модны судалгаа">ПУ-5 дэр модны судалгаа</a>
+          <a href="#" id="pu2-zamtomor-link" data-page-key="ПУ-2 зам төмрийн судалгаа">ПУ-2 зам төмрийн судалгаа</a>
+          <a href="#" id="noots-zamtomor-link" data-page-key="Нөөц зам төмрийн судалгаа">Нөөц зам төмрийн судалгаа</a>
+          <a href="#" id="uulzvar-zai-link" data-page-key="Уулзварын зайн судалгаа">Уулзварын зайн судалгаа</a>
         </div>
       </div>
 
@@ -1001,8 +1004,12 @@
       </div>
 
       <div class="sidebar-divider"></div>
-      <div class="sidebar-item">
-          <a href="#" class="sidebar-link" id="passport-link" data-page-key="Паспортын үзлэг"><i class="fa fa-calculator"></i> Паспортын үзлэг</a>
+      <div class="sidebar-item has-sub" onclick="toggleSub(this)">
+        <div class="sidebar-link"><i class="fa fa-calculator"></i> Паспортын үзлэг</div>
+        <div class="sidebar-sub">
+          <a href="passport.html" id="passport-link" data-page-key="Паспортын үзлэг">Дэр модны үзлэг</a>
+          <a href="dvnz.html" id="dvnz-link" data-page-key="Дүнзний үзлэг">Дүнзний үзлэг</a>
+        </div>
       </div>
       <div class="sidebar-item">
         <a href="#" class="sidebar-link" data-page-key="ХАБЭА / Эрсдэлийн үнэлгээ"><i class="fa fa-chart-bar"></i> Эрсдэлийн үнэлгээ</a>
@@ -1044,119 +1051,16 @@
 
 <script>
   let pageMap = {};
-  const EDIT_ACCESS_CODE = '40@971#68';
   const UI_STORAGE_KEYS = {
     lastPage: 'ubtz:index:last-page',
     editMode: 'ubtz:index:edit-mode'
   };
   const FRAME_STORAGE_PREFIX = 'ubtz:autosave:';
-
-  let isEditMode = false;
-
-  function readEditModeState() {
-    try {
-      return sessionStorage.getItem(UI_STORAGE_KEYS.editMode) === '1';
-    } catch (error) {
-      return false;
-    }
-  }
-
-  function writeEditModeState(enabled) {
-    try {
-      sessionStorage.setItem(UI_STORAGE_KEYS.editMode, enabled ? '1' : '0');
-    } catch (error) {
-      console.warn('Edit mode state write failed:', error);
-    }
-  }
-
-  function setEditAccessInFrame(doc, enabled) {
-    if (!doc || !doc.body) {
-      return;
-    }
-
-    const controls = doc.querySelectorAll('input, textarea, select, button');
-    controls.forEach(function(element) {
-      if (element.hasAttribute('data-view-allowed')) {
-        return;
-      }
-      const isFormField = element.matches('input, textarea, select');
-      if (!enabled) {
-        if (isFormField) {
-          element.setAttribute('readonly', 'readonly');
-        }
-        element.setAttribute('disabled', 'disabled');
-        element.setAttribute('aria-disabled', 'true');
-        element.dataset.lockedByMode = 'true';
-      } else if (element.dataset.lockedByMode === 'true') {
-        element.removeAttribute('readonly');
-        element.removeAttribute('disabled');
-        element.removeAttribute('aria-disabled');
-        delete element.dataset.lockedByMode;
-      }
-    });
-
-    const editables = doc.querySelectorAll('[contenteditable]');
-    editables.forEach(function(element) {
-      if (!enabled) {
-        element.dataset.originalContenteditable = element.getAttribute('contenteditable') || 'true';
-        element.setAttribute('contenteditable', 'false');
-      } else if (element.dataset.originalContenteditable) {
-        element.setAttribute('contenteditable', element.dataset.originalContenteditable);
-        delete element.dataset.originalContenteditable;
-      }
-    });
-  }
-
-  function applyEditModeUI() {
-    const badge = document.getElementById('mode-badge');
-    const button = document.getElementById('mode-toggle-btn');
-    if (!badge || !button) {
-      return;
-    }
-    if (isEditMode) {
-      badge.textContent = 'Засварлах горим';
-      badge.classList.remove('view');
-      badge.classList.add('edit');
-      button.textContent = 'Гарах';
-      button.classList.add('logout');
-    } else {
-      badge.textContent = 'Харах горим';
-      badge.classList.remove('edit');
-      badge.classList.add('view');
-      button.textContent = 'Кодоор нэвтрэх';
-      button.classList.remove('logout');
-    }
-  }
-
-  function applyEditModeToCurrentFrame() {
-    const frame = document.getElementById('content-frame');
-    if (!frame) {
-      return;
-    }
-    try {
-      setEditAccessInFrame(frame.contentDocument, isEditMode);
-    } catch (error) {
-      console.warn('Frame edit mode sync skipped:', error);
-    }
-  }
-
-  function setEditMode(enabled) {
-    isEditMode = Boolean(enabled);
-    writeEditModeState(isEditMode);
-    applyEditModeUI();
-    applyEditModeToCurrentFrame();
-  }
-
-  function handleModeToggle() {
-    if (isEditMode) {
-      setEditMode(false);
-      return;
-    }
-    const code = window.prompt('Нэвтрэх код оруулна уу');
-    if (code === EDIT_ACCESS_CODE) {
-      setEditMode(true);
-    }
-  }
+  const EDIT_UNLOCK_CODE = '40@971#68';
+  const FULLSCREEN_PAGE_KEYS = new Set([
+    'Ажлын бүртгэл',
+    'Хурлын тэмдэглэл'
+  ]);
 
   function readLastPage() {
     try {
@@ -1174,21 +1078,148 @@
     }
   }
 
+  function readEditMode() {
+    try {
+      return sessionStorage.getItem(UI_STORAGE_KEYS.editMode) === 'edit' ? 'edit' : 'view';
+    } catch (error) {
+      return 'view';
+    }
+  }
+
+  function writeEditMode(mode) {
+    try {
+      sessionStorage.setItem(UI_STORAGE_KEYS.editMode, mode === 'edit' ? 'edit' : 'view');
+    } catch (error) {
+      console.warn('Edit mode state write failed:', error);
+    }
+  }
+
+  function isEditModeEnabled() {
+    return readEditMode() === 'edit';
+  }
+
+  function syncEditModeUi() {
+    const enabled = isEditModeEnabled();
+    const badge = document.getElementById('mode-badge');
+    const button = document.getElementById('mode-toggle');
+    if (badge) {
+      badge.textContent = enabled ? 'Засварлах горим' : 'Харах горим';
+      badge.classList.toggle('edit', enabled);
+    }
+    if (button) {
+      button.textContent = enabled ? 'Гарах' : 'Кодоор нэвтрэх';
+      button.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+    }
+    document.body.dataset.editMode = enabled ? 'edit' : 'view';
+  }
+
+  function setEditMode(enabled) {
+    writeEditMode(enabled ? 'edit' : 'view');
+    syncEditModeUi();
+    const frame = document.getElementById('content-frame');
+    if (frame) {
+      applyFrameEditMode(frame);
+    }
+  }
+
+  function captureEditState(element) {
+    if (element.dataset.copilotEditStateCaptured === 'true') {
+      return;
+    }
+    element.dataset.copilotEditStateCaptured = 'true';
+    element.dataset.copilotOrigDisabled = element.disabled ? 'true' : 'false';
+    if ('readOnly' in element) {
+      element.dataset.copilotOrigReadonly = element.readOnly ? 'true' : 'false';
+    }
+    element.dataset.copilotOrigHasContenteditable = element.hasAttribute('contenteditable') ? 'true' : 'false';
+    if (element.hasAttribute('contenteditable')) {
+      element.dataset.copilotOrigContenteditable = element.getAttribute('contenteditable') || '';
+    }
+  }
+
+  function restoreEditState(element) {
+    if (element.dataset.copilotOrigDisabled !== undefined) {
+      element.disabled = element.dataset.copilotOrigDisabled === 'true';
+    }
+    if ('readOnly' in element && element.dataset.copilotOrigReadonly !== undefined) {
+      element.readOnly = element.dataset.copilotOrigReadonly === 'true';
+    }
+    if (element.dataset.copilotOrigHasContenteditable === 'true') {
+      const originalValue = element.dataset.copilotOrigContenteditable || '';
+      if (originalValue === '') {
+        element.removeAttribute('contenteditable');
+      } else {
+        element.setAttribute('contenteditable', originalValue);
+      }
+    } else if (element.matches('[contenteditable]')) {
+      element.removeAttribute('contenteditable');
+    }
+    element.removeAttribute('aria-readonly');
+  }
+
+  function setElementEditableState(element, enabled) {
+    if (!(element instanceof element.ownerDocument.defaultView.HTMLElement)) {
+      return;
+    }
+
+    // Keep selected footer controls interactive on the daily briefing page.
+    if (element.id === 'preparedBy' || element.id === 'reviewedBy' || element.id === 'saveDataBtn') {
+      captureEditState(element);
+      restoreEditState(element);
+      return;
+    }
+
+    // Keep the management checklist table fully interactive.
+    if (element.closest && element.closest('#recordTable')) {
+      captureEditState(element);
+      restoreEditState(element);
+      return;
+    }
+
+    captureEditState(element);
+
+    if (enabled) {
+      restoreEditState(element);
+      return;
+    }
+
+    if (element.matches('button, input[type="button"], input[type="submit"], input[type="reset"], input[type="file"], select')) {
+      element.disabled = true;
+      return;
+    }
+
+    if (element.matches('textarea')) {
+      element.readOnly = true;
+      element.setAttribute('aria-readonly', 'true');
+      return;
+    }
+
+    if (element.matches('input')) {
+      const inputType = (element.getAttribute('type') || 'text').toLowerCase();
+      if (inputType === 'checkbox' || inputType === 'radio' || inputType === 'range' || inputType === 'color') {
+        element.disabled = true;
+      } else {
+        element.readOnly = true;
+        element.setAttribute('aria-readonly', 'true');
+      }
+      return;
+    }
+
+    if (element.isContentEditable) {
+      element.setAttribute('contenteditable', 'false');
+      element.setAttribute('aria-readonly', 'true');
+    }
+  }
+
   const staticPageFallbacks = {
+    'Ирц бүртгэл': 'irts.html',
+    'Өдөр тутмын зааварчилгаа': 'zoovorchilgoo.html',
     'Зааварчилгаа / Зам засвар': 'zoovorchilgoo.html',
-    'Зааварчилгаа / Тор засагч': 'section-placeholder.html#%D0%A2%D0%BE%D1%80%20%D0%B7%D0%B0%D1%81%D0%B0%D0%B3%D1%87',
-    'Зааварчилгаа / Үерийн эргүүл': 'section-placeholder.html#%D2%AE%D0%B5%D1%80%D0%B8%D0%B9%D0%BD%20%D1%8D%D1%80%D0%B3%D2%AF%D2%AF%D0%BB',
-    'Зааварчилгаа / Ажил удирдагч': 'section-placeholder.html#%D0%90%D0%B6%D0%B8%D0%BB%20%D1%83%D0%B4%D0%B8%D1%80%D0%B4%D0%B0%D0%B3%D1%87',
-    'Зааварчилгаа / Зам сум цэвэрлэгч': 'section-placeholder.html#%D0%97%D0%B0%D0%BC%20%D1%81%D1%83%D0%BC%20%D1%86%D1%8D%D0%B2%D1%8D%D1%80%D0%BB%D1%8D%D0%B3%D1%87',
-    'Зааварчилгаа / Жолооч': 'section-placeholder.html#%D0%96%D0%BE%D0%BB%D0%BE%D0%BE%D1%87',
-    'Зааварчилгаа / Сахиул': 'section-placeholder.html#%D0%A1%D0%B0%D1%85%D0%B8%D1%83%D0%BB',
-    'Зааварчилгаа / Гармын жижүүр': 'section-placeholder.html#%D0%93%D0%B0%D1%80%D0%BC%D1%8B%D0%BD%20%D0%B6%D0%B8%D0%B6%D2%AF%D2%AF%D1%80',
-    'Зааварчилгаа / Сэвийн оператор': 'section-placeholder.html#%D0%A1%D1%8D%D0%B2%D0%B8%D0%B9%D0%BD%20%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80',
-    'Зааварчилгаа / Тогооч': 'section-placeholder.html#%D0%A2%D0%BE%D0%B3%D0%BE%D0%BE%D1%87',
-    'Зааварчилгаа / Ээлжит давтан': 'section-placeholder.html#%D0%AD%D1%8D%D0%BB%D0%B6%D0%B8%D1%82%20%D0%B4%D0%B0%D0%B2%D1%82%D0%B0%D0%BD',
     'Цахилгаан': 'tsahilgaan.html',
     'Төлөвлөгөө / Сарын ажлын төлөвлөгөө': 'sariin.html',
     'Шийдвэр': 'shiidwer.html',
+    'Ажлын бүртгэл': 'ajliinBvrtgel.html',
+    'Хурлын тэмдэглэл': 'hural.html',
     'Үүрэг даалгавар': 'ita.html',
     'Менежментийн нэгдсэн тогтолцоо': 'anhaar.html',
     'Ажилтануудын мэдээлэл': 'ajiltan.html',
@@ -1200,13 +1231,11 @@
     'Нөөц зам төмрийн судалгаа': 'nootsZT.html',
     'Уулзварын зайн судалгаа': 'uZai.html',
     'ХАБЭА-н үзлэг': 'habea.html',
-    'Ажлын бүртгэл': 'ajliinBvrtgel.html',
-    'Хурлын тэмдэглэл': 'hural.html',
     'Паспортын үзлэг': 'passport.html',
     'Замын техникийн байдал': 'tech.html',
     'Хэсгийн танилцуулга': 'heseg.html',
     'Бүртгэл': 'bvrtgel.html',
-    'Ирц бүртгэл': 'irts.html'
+    'ХАБЭА / Эрсдэлийн үнэлгээ': 'ersdeliinVnelgee.html'
   };
 
   function findPageElement(pageKey) {
@@ -1395,6 +1424,61 @@
     observer.observe(doc.body, { childList: true, subtree: true });
   }
 
+  function setupFrameEditMode(doc) {
+    if (doc.documentElement.dataset.editModeReady === 'true') {
+      return;
+    }
+    doc.documentElement.dataset.editModeReady = 'true';
+
+    function refreshElement(node) {
+      if (!(node instanceof node.ownerDocument.defaultView.HTMLElement)) {
+        return;
+      }
+      if (node.matches('input, textarea, select, button, [contenteditable]')) {
+        setElementEditableState(node, isEditModeEnabled());
+      }
+      node.querySelectorAll('input, textarea, select, button, [contenteditable]').forEach(function(element) {
+        setElementEditableState(element, isEditModeEnabled());
+      });
+    }
+
+    refreshElement(doc.body);
+
+    const observer = new MutationObserver(function(mutations) {
+      const enabled = isEditModeEnabled();
+      mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            if (node.matches('input, textarea, select, button, [contenteditable]')) {
+              setElementEditableState(node, enabled);
+            }
+            node.querySelectorAll('input, textarea, select, button, [contenteditable]').forEach(function(element) {
+              setElementEditableState(element, enabled);
+            });
+          }
+        });
+      });
+    });
+    observer.observe(doc.body, { childList: true, subtree: true });
+  }
+
+  function applyFrameEditMode(frame) {
+    try {
+      const doc = frame.contentDocument;
+      if (!doc || !doc.body) {
+        return;
+      }
+      const enabled = isEditModeEnabled();
+      doc.documentElement.dataset.editMode = enabled ? 'edit' : 'view';
+      doc.body.dataset.editMode = enabled ? 'edit' : 'view';
+      doc.querySelectorAll('input, textarea, select, button, [contenteditable]').forEach(function(element) {
+        setElementEditableState(element, enabled);
+      });
+    } catch (error) {
+      console.warn('Frame edit mode sync skipped:', error);
+    }
+  }
+
   function injectFrameStyles(doc) {
     if (doc.getElementById('copilot-frame-responsive-style')) {
       return;
@@ -1407,15 +1491,21 @@
       'img, svg { max-width: 100%; height: auto; }',
       'iframe { max-width: 100%; }',
       'input, textarea, select { max-width: 100%; }',
-      '.container, .wrapper, .dashboard, .main-content { width: 100% !important; max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; }',
-      '.wrap { width: 100% !important; max-width: none !important; padding-left: 20px !important; padding-right: 20px !important; }',
-      'body > .max-w-7xl { width: 100% !important; max-width: none !important; }',
+      '.container, .wrapper, .dashboard, .main-content, .wrap, .inner, .max-w-7xl { width: 100% !important; max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; }',
       '.table-container, .table-wrapper, [class*="table-container"], [class*="table-wrapper"] { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }',
       '@media (max-width: 768px) {',
       '  body { min-width: 0 !important; }',
       '}'
     ].join(' ');
     doc.head.appendChild(style);
+  }
+
+  function syncFramePresentation(pageKey) {
+    const main = document.querySelector('.main');
+    if (!main) {
+      return;
+    }
+    main.classList.toggle('fullscreen-main', FULLSCREEN_PAGE_KEYS.has(pageKey));
   }
 
   function getFrameContentHeight(doc) {
@@ -1527,13 +1617,14 @@
       ensureFrameViewport(doc);
       injectFrameStyles(doc);
       bindFrameAutoHeight(frame);
+      setupFrameEditMode(doc);
+      applyFrameEditMode(frame);
       syncFrameSize(frame);
       const autosaveMeta = doc.querySelector('meta[name="copilot-frame-autosave"]');
       const autosaveDisabled = autosaveMeta && String(autosaveMeta.getAttribute('content') || '').toLowerCase() === 'off';
       if (!autosaveDisabled) {
         setupFrameAutosave(doc, getAutosaveStorageKey(frame));
       }
-      setEditAccessInFrame(doc, isEditMode);
     } catch (error) {
       console.warn('Frame enhancements skipped:', error);
     }
@@ -1580,20 +1671,17 @@
   }
 
   function setActiveSidebarLink(activeLink) {
-    document.querySelectorAll('.sidebar-link.active, .sidebar-sub a.active').forEach(function(link) {
+    document.querySelectorAll('.sidebar-link.active').forEach(function(link) {
       link.classList.remove('active');
     });
     const alertLink = document.getElementById('toggle-alert');
     if (alertLink) {
       alertLink.classList.remove('active-alert');
     }
-    const targetLink = activeLink && (activeLink.classList.contains('sidebar-link') || activeLink.matches('.sidebar-sub a') || activeLink.closest('.sidebar-sub'))
-      ? activeLink
-      : null;
-    if (targetLink) {
-      targetLink.classList.add('active');
-      if (targetLink.id === 'toggle-alert') {
-        targetLink.classList.add('active-alert');
+    if (activeLink && activeLink.classList.contains('sidebar-link')) {
+      activeLink.classList.add('active');
+      if (activeLink.id === 'toggle-alert') {
+        activeLink.classList.add('active-alert');
       }
     }
   }
@@ -1608,12 +1696,13 @@
     const frame = document.getElementById('content-frame');
     const frameTitle = document.getElementById('frame-title-label');
     const titleText = clickedElement.textContent.trim().replace(/\s+/g, ' ');
+    syncFramePresentation(pageKey);
     frame.src = resolvePageSrc(pageKey, titleText);
     writeLastPage(pageKey);
     if (frameTitle) {
       frameTitle.textContent = titleText.toUpperCase();
     }
-    setActiveSidebarLink(clickedElement);
+    setActiveSidebarLink(clickedElement.closest('.sidebar-link'));
     closeTopNavMenus();
     if (window.matchMedia('(max-width: 1024px)').matches) {
       closeSidebar();
@@ -1622,22 +1711,40 @@
 
   document.addEventListener('DOMContentLoaded', async function() {
     await loadPageMap();
-    isEditMode = readEditModeState();
-    applyEditModeUI();
+    syncEditModeUi();
 
     const frame = document.getElementById('content-frame');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const modeToggleBtn = document.getElementById('mode-toggle-btn');
+    const modeToggle = document.getElementById('mode-toggle');
 
     if (frame) {
       frame.addEventListener('load', function() {
         enhanceFrame(frame);
       });
+      if (frame.contentDocument && frame.contentDocument.readyState === 'complete') {
+        enhanceFrame(frame);
+      }
     }
 
-    if (modeToggleBtn) {
-      modeToggleBtn.addEventListener('click', handleModeToggle);
+    if (modeToggle) {
+      modeToggle.addEventListener('click', function() {
+        if (isEditModeEnabled()) {
+          setEditMode(false);
+          return;
+        }
+
+        const enteredCode = window.prompt('Кодоор нэвтрэх код оруулна уу');
+        if (enteredCode === null) {
+          return;
+        }
+
+        if (enteredCode === EDIT_UNLOCK_CODE) {
+          setEditMode(true);
+        } else {
+          window.alert('Код буруу байна.');
+        }
+      });
     }
 
     if (sidebarToggle) {
