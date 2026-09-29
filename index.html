@@ -443,6 +443,15 @@
     .main.fullscreen-main {
       padding: 0;
     }
+    .main.video-fullscreen-main {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      width: 100vw;
+      height: 100dvh;
+      min-height: 100dvh;
+      overflow: hidden;
+    }
 
     /* Welcome / Dashboard panel */
     .dashboard {
@@ -588,6 +597,14 @@
       min-height: calc(100dvh - var(--topbar-height));
       max-height: calc(100dvh - var(--topbar-height));
     }
+    .main.video-fullscreen-main .content-frame-wrap {
+      width: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
+      max-height: 100dvh;
+      border: 0;
+      border-radius: 0;
+    }
     .frame-titlebar {
       display: flex;
       align-items: center;
@@ -616,6 +633,9 @@
     }
     .main.fullscreen-main #content-frame {
       min-height: calc(100dvh - var(--topbar-height));
+    }
+    .main.video-fullscreen-main #content-frame {
+      min-height: 100dvh;
     }
 
     .sidebar-overlay {
@@ -1003,6 +1023,10 @@
         <a href="#" class="sidebar-link" id="habea-link" data-page-key="ХАБЭА-н үзлэг"><i class="fa fa-layer-group"></i>ХАБЭА-н үзлэг</a>
       </div>
 
+      <div class="sidebar-item">
+        <a href="#" class="sidebar-link" id="surgalt-link" data-page-key="Сургалт"><i class="fa fa-graduation-cap"></i>Сургалт</a>
+      </div>
+
       <div class="sidebar-divider"></div>
       <div class="sidebar-item has-sub" onclick="toggleSub(this)">
         <div class="sidebar-link"><i class="fa fa-calculator"></i> Паспортын үзлэг</div>
@@ -1059,7 +1083,8 @@
   const EDIT_UNLOCK_CODE = '40@971#68';
   const FULLSCREEN_PAGE_KEYS = new Set([
     'Ажлын бүртгэл',
-    'Хурлын тэмдэглэл'
+    'Хурлын тэмдэглэл',
+    'Зааварчилгаа / Тор засагч'
   ]);
 
   function readLastPage() {
@@ -1231,6 +1256,7 @@
     'Нөөц зам төмрийн судалгаа': 'nootsZT.html',
     'Уулзварын зайн судалгаа': 'uZai.html',
     'ХАБЭА-н үзлэг': 'habea.html',
+    'Сургалт': 'surgalt.html',
     'Паспортын үзлэг': 'passport.html',
     'Замын техникийн байдал': 'tech.html',
     'Хэсгийн танилцуулга': 'heseg.html',
@@ -1506,6 +1532,7 @@
       return;
     }
     main.classList.toggle('fullscreen-main', FULLSCREEN_PAGE_KEYS.has(pageKey));
+    main.classList.toggle('video-fullscreen-main', pageKey === 'Зааварчилгаа / Тор засагч');
   }
 
   function getFrameContentHeight(doc) {
